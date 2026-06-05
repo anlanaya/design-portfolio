@@ -5,6 +5,13 @@ export async function onRequest(context) {
     return new Response("Missing code", { status: 400 });
   }
 
+  const secret = context.env.GH_CLIENT_SECRET || "";
+  if (!secret) {
+    // 调试：检查 secret 是否为空
+    const keys = Object.keys(context.env).join(",");
+    return new Response("GH_CLIENT_SECRET is empty. Available keys: " + keys, { status: 500, headers: { "Content-Type": "text/plain; charset=utf-8" } });
+  }
+
   const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: {
@@ -13,7 +20,7 @@ export async function onRequest(context) {
     },
     body: JSON.stringify({
       client_id: "Ov23li87HPVkywfQf6g7",
-      client_secret: context.env.GH_CLIENT_SECRET,
+      client_secret: secret,
       code: code
     })
   });
