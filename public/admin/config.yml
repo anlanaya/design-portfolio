@@ -2,6 +2,8 @@ backend:
   name: github
   repo: anlanaya/design-portfolio
   branch: master
+  auth_type: implicit
+  auth_scope: repo
 
 site_url: https://design.gmlbest.top
 display_url: https://design.gmlbest.top
