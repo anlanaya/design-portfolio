@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   integrations: [tailwind()],
-  site: 'https://your-domain.com',
+  site: 'https://design.gmlbest.top',
   markdown: {
     shikiConfig: {
       theme: 'github-light',

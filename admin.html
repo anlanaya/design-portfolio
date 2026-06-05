@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计案例管理后台</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f5f5; color: #1a1a1a; line-height: 1.6;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+    h1 .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+
+    .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-full { grid-column: 1 / -1; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+    label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    textarea { min-height: 80px; resize: vertical; }
+
+    .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .tag-btn { padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; cursor: pointer; background: #fff; color: #666; transition: all 0.15s; user-select: none; }
+    .tag-btn:hover { border-color: #999; }
+    .tag-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+    .btn { padding: 10px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #1a1a1a; color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn-secondary:hover { background: #ddd; }
+    .btn-danger { background: #fef2f2; color: #dc2626; }
+    .btn-danger:hover { background: #fee2e2; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 20px; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a1a; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); transition: all 0.3s; z-index: 999; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: #16a34a; }
+    .toast.error { background: #dc2626; }
+
+    .case-list { list-style: none; }
+    .case-list li { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+    .case-list li:last-child { border-bottom: none; }
+    .case-count { font-size: 13px; color: #999; margin-bottom: 12px; }
+
+    .platform-hint { display: flex; gap: 8px; margin-top: 8px; }
+    .platform-btn { padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+    .platform-btn.active { border-color: #3b82f6; background: #eff6ff; color: #3b82f6; }
+
+    .deploy-section { border-top: 2px dashed #eee; padding-top: 20px; }
+    .deploy-section h3 { font-size: 16px; margin-bottom: 8px; }
+    .deploy-section p { font-size: 13px; color: #666; margin-bottom: 12px; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <span class="dot"></span> 设计案例管理后台
+    </h1>
+
+    <!-- 表单 -->
+    <div class="card">
+      <h2 style="font-size:18px;font-weight:600;margin-bottom:16px;">+ 新增案例</h2>
+
+      <div class="form-grid">
+        <div class="form-full">
+          <label>📋 案例标题 *</label>
+          <input type="text" id="title" placeholder="如：纯白叙事 · 现代极简客厅">
+        </div>
+
+        <div class="form-full">
+          <label>📝 简短描述 *</label>
+          <textarea id="description" placeholder="一句话概括这个案例的特点..."></textarea>
+        </div>
+
+        <div class="form-full">
+          <label>🔗 来源链接（小红书/抖音帖子链接）</label>
+          <input type="url" id="sourceUrl" placeholder="https://www.xiaohongshu.com/explore/xxx">
+          <div class="platform-hint">
+            <button class="platform-btn active" data-platform="xiaohongshu">📕 小红书</button>
+            <button class="platform-btn" data-platform="douyin">🎵 抖音</button>
+            <button class="platform-btn" data-platform="original">✨ 原创</button>
+          </div>
+        </div>
+
+        <div>
+          <label>📐 面积（㎡）</label>
+          <input type="number" id="area" placeholder="80">
+        </div>
+
+        <div>
+          <label>📍 项目地点</label>
+          <input type="text" id="location" placeholder="上海">
+        </div>
+
+        <div>
+          <label>🖼️ 封面图 URL</label>
+          <input type="url" id="cover" placeholder="https://images.unsplash.com/...">
+        </div>
+
+        <div>
+          <label>📅 发布日期（留空用今天）</label>
+          <input type="date" id="publishDate">
+        </div>
+
+        <div class="form-full">
+          <label>🏠 空间标签（可多选）</label>
+          <div class="tag-group" id="spaces-tags"></div>
+        </div>
+
+        <div class="form-full">
+          <label>🎨 风格标签（可多选）</label>
+          <div class="tag-group" id="styles-tags"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-save">💾 保存案例</button>
+        <button class="btn btn-secondary" id="btn-reset">重置</button>
+      </div>
+    </div>
+
+    <!-- 已有案例列表 -->
+    <div class="card">
+      <h2 style="font-size:18px;font-weight:600;margin-bottom:16px;">📂 已有案例</h2>
+      <div class="case-count" id="case-count">加载中...</div>
+      <ul class="case-list" id="case-list"></ul>
+    </div>
+
+    <!-- 部署区域 -->
+    <div class="card deploy-section">
+      <h3>🚀 发布到线上</h3>
+      <p>保存案例后，运行以下步骤发布网站：</p>
+      <div class="btn-row" style="flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btn-build">1. 构建网站</button>
+        <button class="btn btn-secondary" id="btn-open-dist">2. 打开 dist 文件夹</button>
+      </div>
+      <p style="margin-top:12px;font-size:12px;color:#999;">
+        或双击项目目录中的 <code>发布.bat</code> 一键构建。<br>
+        构建完成后，去 Cloudflare Pages → design-cases → 直接上传 → 拖入 dist 文件夹。
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== 数据定义 ==========
+    const SPACES = [
+      { slug: 'whole-house', label: '全屋案例' },
+      { slug: 'living-room', label: '客厅' },
+      { slug: 'bedroom', label: '卧室' },
+      { slug: 'kitchen-dining', label: '厨餐厅' },
+      { slug: 'bathroom', label: '卫生间' },
+      { slug: 'study', label: '书房' },
+      { slug: 'entrance', label: '玄关' },
+      { slug: 'balcony', label: '阳台' },
+      { slug: 'kids-room', label: '儿童房' },
+      { slug: 'cloakroom', label: '衣帽间' },
+      { slug: 'commercial', label: '商业空间' },
+    ];
+
+    const STYLES = [
+      { slug: 'modern-minimalist', label: '现代极简' },
+      { slug: 'japanese-wabisabi', label: '日式/侘寂' },
+      { slug: 'nordic', label: '北欧' },
+      { slug: 'neo-chinese', label: '新中式' },
+      { slug: 'light-luxury', label: '轻奢' },
+      { slug: 'industrial', label: '工业风' },
+      { slug: 'cream-style', label: '奶油风' },
+      { slug: 'original-wood', label: '原木风' },
+      { slug: 'vintage', label: '复古' },
+    ];
+
+    let selectedSpaces = [];
+    let selectedStyles = [];
+    let currentPlatform = 'xiaohongshu';
+
+    // ========== 初始化标签按钮 ==========
+    function initTags(containerId, items, selectedArr) {
+      const container = document.getElementById(containerId);
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-btn';
+        btn.textContent = item.label;
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('active');
+          const idx = selectedArr.indexOf(item.slug);
+          if (idx > -1) selectedArr.splice(idx, 1);
+          else selectedArr.push(item.slug);
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    initTags('spaces-tags', SPACES, selectedSpaces);
+    initTags('styles-tags', STYLES, selectedStyles);
+
+    // ========== 平台切换 ==========
+    document.querySelectorAll('.platform-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPlatform = btn.dataset.platform;
+      });
+    });
+
+    // ========== Toast ==========
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type + ' show';
+      setTimeout(() => { t.className = 'toast'; }, 3000);
+    }
+
+    // ========== 加载案例列表 ==========
+    async function loadCases() {
+      try {
+        const res = await fetch('/api/cases');
+        const cases = await res.json();
+        document.getElementById('case-count').textContent = `共 ${cases.length} 个案例`;
+        const list = document.getElementById('case-list');
+        list.innerHTML = cases.map(f =>
+          `<li>
+            <span>📄 ${f}</span>
+            <button class="btn btn-danger" style="padding:4px 12px;font-size:12px;" onclick="deleteCase('${f}')">删除</button>
+          </li>`
+        ).join('');
+      } catch (err) {
+        document.getElementById('case-count').textContent = '加载失败（请确认后台服务已启动）';
+      }
+    }
+
+    // ========== 删除案例 ==========
+    window.deleteCase = async function(filename) {
+      if (!confirm(`确定删除 ${filename}？`)) return;
+      await fetch(`/api/cases/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+      showToast('已删除', 'success');
+      loadCases();
+    };
+
+    // ========== 保存案例 ==========
+    document.getElementById('btn-save').addEventListener('click', async () => {
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+
+      if (!title || !description) {
+        showToast('标题和描述不能为空', 'error');
+        return;
+      }
+
+      if (selectedSpaces.length === 0) {
+        showToast('请至少选一个空间标签', 'error');
+        return;
+      }
+
+      if (selectedStyles.length === 0) {
+        showToast('请至少选一个风格标签', 'error');
+        return;
+      }
+
+      const data = {
+        title,
+        description,
+        sourceUrl: document.getElementById('sourceUrl').value.trim() || undefined,
+        sourcePlatform: currentPlatform,
+        spaces: selectedSpaces,
+        styles: selectedStyles,
+        area: parseInt(document.getElementById('area').value) || undefined,
+        location: document.getElementById('location').value.trim() || undefined,
+        cover: document.getElementById('cover').value.trim() || undefined,
+        publishDate: document.getElementById('publishDate').value || undefined,
+      };
+
+      try {
+        const res = await fetch('/api/cases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(`✅ 案例已保存: ${result.filename}`);
+          document.getElementById('btn-reset').click();
+          loadCases();
+        } else {
+          showToast(result.error || '保存失败', 'error');
+        }
+      } catch (err) {
+        showToast('保存失败：请确认后台服务已启动 (node admin-server.js)', 'error');
+      }
+    });
+
+    // ========== 重置表单 ==========
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('sourceUrl').value = '';
+      document.getElementById('area').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('cover').value = '';
+      document.getElementById('publishDate').value = '';
+      selectedSpaces.length = 0;
+      selectedStyles.length = 0;
+      document.querySelectorAll('#spaces-tags .tag-btn, #styles-tags .tag-btn').forEach(b => b.classList.remove('active'));
+      currentPlatform = 'xiaohongshu';
+      document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-platform="xiaohongshu"]').classList.add('active');
+    });
+
+    // ========== 构建 ==========
+    document.getElementById('btn-build').addEventListener('click', async () => {
+      showToast('请手动运行命令: npm run build', 'success');
+    });
+
+    // ========== 打开 dist ==========
+    document.getElementById('btn-open-dist').addEventListener('click', () => {
+      showToast('请在文件管理器中打开: 项目目录\\dist', 'success');
+    });
+
+    // 初始加载
+    loadCases();
+  </script>
+</body>
+</html>
