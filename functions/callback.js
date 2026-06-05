@@ -18,14 +18,20 @@ export async function onRequest(context) {
     })
   });
 
-  const data = await tokenRes.json();
-  const jsonStr = JSON.stringify(data);
+  const ghData = await tokenRes.json();
+
+  // Decap CMS 期望的格式：{ token: "..." }
+  const token = ghData.access_token || ghData.token || "";
+  if (!token) {
+    return new Response("GitHub returned: " + JSON.stringify(ghData), { status: 500, headers: { "Content-Type": "text/plain" } });
+  }
+
+  const payload = JSON.stringify({ token: token, provider: "github" });
 
   const html = [
     "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><script>",
     "try{",
-    "var t=" + jsonStr + ";",
-    "window.opener&&window.opener.postMessage(JSON.stringify(t),\"*\");",
+    "window.opener&&window.opener.postMessage(" + payload + ",\"*\");",
     "document.body.innerHTML='<h2>授权成功</h2><p>关闭此窗口即可</p>';",
     "setTimeout(function(){window.close()},3000);",
     "}catch(e){document.body.innerHTML='<p>Error: '+e.message+'</p>';}",
