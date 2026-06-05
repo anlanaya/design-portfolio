@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="关于我"
+  description="了解设计案例库背后的设计师"
+>
+  <div class="max-w-4xl mx-auto px-4 md:px-8 py-12 md:py-20">
+    <p class="text-xs font-medium text-accent-500 uppercase tracking-wider mb-2">About</p>
+    <h1 class="text-3xl md:text-4xl font-display font-bold text-accent-900 mb-12">关于我</h1>
+
+    <div class="prose prose-lg prose-accent max-w-none">
+      <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 md:gap-12">
+        <!-- 头像占位 -->
+        <div class="hidden md:block">
+          <div class="w-full aspect-[3/4] bg-accent-100 rounded-lg flex items-center justify-center">
+            <span class="text-accent-400 text-sm">个人照片</span>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <p class="text-xl text-accent-500 leading-relaxed">
+            我是一名室内设计师，专注于住宅与商业空间设计。这个网站的创建初衷是建立一个设计案例参考库，用来整理和分享我在日常工作中收集的优秀设计案例。
+          </p>
+
+          <h2 class="text-xl font-display font-semibold text-accent-900 !mt-10">设计理念</h2>
+          <p class="text-accent-600 leading-relaxed">
+            好的设计不是风格的复制粘贴，而是对居住者生活方式的深度理解。我相信每个空间都该有自己的故事——它来自使用者的习惯、情感和审美，而不是设计师的自我表达。
+          </p>
+
+          <h2 class="text-xl font-display font-semibold text-accent-900 !mt-10">关于这个案例库</h2>
+          <p class="text-accent-600 leading-relaxed">
+            案例库中的设计参考来自小红书、抖音等平台以及我自己的原创设计。每一个案例都按照<strong>空间功能</strong>和<strong>设计风格</strong>进行了双维度分类，方便快速找到对应的灵感参考。
+          </p>
+          <p class="text-accent-600 leading-relaxed">
+            案例库持续更新中。如果你有好设计想分享，欢迎联系我。
+          </p>
+
+          <div class="!mt-10 flex gap-4">
+            <a href="/contact" class="btn-primary">联系我</a>
+            <a href="/" class="btn-outline">浏览案例</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

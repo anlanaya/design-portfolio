@@ -1,0 +1,40 @@
+---
+interface FilterOption {
+  slug: string;
+  label: string;
+}
+
+interface Props {
+  title: string;
+  options: FilterOption[];
+  activeSlug: string;
+  baseUrl: string;
+  allLabel?: string;
+}
+
+const { title, options, activeSlug, baseUrl, allLabel = '全部' } = Astro.props;
+---
+
+<div class="flex items-center gap-2 flex-wrap">
+  <span class="text-sm font-medium text-accent-500 mr-1">{title}:</span>
+  <a
+    href={baseUrl}
+    class:list={[
+      'tag',
+      { 'tag-active': !activeSlug }
+    ]}
+  >
+    {allLabel}
+  </a>
+  {options.map((opt) => (
+    <a
+      href={`${baseUrl}${opt.slug}`}
+      class:list={[
+        'tag',
+        { 'tag-active': activeSlug === opt.slug }
+      ]}
+    >
+      {opt.label}
+    </a>
+  ))}
+</div>

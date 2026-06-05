@@ -1,0 +1,174 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RelatedCases from '../../components/RelatedCases.astro';
+import { spaces, styles } from '../../data/categories';
+
+export async function getStaticPaths() {
+  const cases = await getCollection('cases');
+  return cases.map(c => ({
+    params: { slug: c.id.replace('.md', '') },
+    props: { case: c },
+  }));
+}
+
+const { case: c } = Astro.props;
+
+if (!c) {
+  return Astro.redirect('/');
+}
+
+const {
+  title, description, cover, gallery, area, location,
+  sourceUrl, sourcePlatform, publishDate, caseSpaces, caseStyles
+} = {
+  ...c.data,
+  caseSpaces: c.data.spaces,
+  caseStyles: c.data.styles,
+};
+
+// 获取标签显示名称
+const spaceLabels = caseSpaces
+  .map(slug => ({ slug, label: spaces.find(s => s.slug === slug)?.label ?? slug }))
+  .filter(x => x.label);
+
+const styleLabels = caseStyles
+  .map(slug => ({ slug, label: styles.find(s => s.slug === slug)?.label ?? slug }))
+  .filter(x => x.label);
+
+// 来源平台名
+const platformLabels: Record<string, string> = {
+  xiaohongshu: '小红书',
+  douyin: '抖音',
+  original: '原创',
+};
+
+const dateStr = publishDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// 所有详情图片（封面 + 画廊）
+const allImages = [cover, ...gallery];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={cover}
+>
+  <article class="max-w-8xl mx-auto px-4 md:px-8 py-8 md:py-12">
+    <!-- 面包屑 -->
+    <nav class="text-sm text-accent-400 mb-8 flex items-center gap-2 flex-wrap">
+      <a href="/" class="hover:text-accent-600 transition-colors">首页</a>
+      <span>/</span>
+      {spaceLabels[0] && (
+        <>
+          <a href={`/spaces/${spaceLabels[0].slug}`} class="hover:text-accent-600 transition-colors">{spaceLabels[0].label}</a>
+          <span>/</span>
+        </>
+      )}
+      <span class="text-accent-600">{title}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 lg:gap-16">
+      <!-- 左侧：图片区 -->
+      <div class="space-y-4">
+        {allImages.map((img, i) => (
+          <a href={img} target="_blank" rel="noopener noreferrer" class="block">
+            <img
+              src={img}
+              alt={i === 0 ? `${title} - 封面` : `${title} - 图${i}`}
+              class="gallery-image rounded-lg"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding={i === 0 ? 'sync' : 'async'}
+              width="1200"
+              height="900"
+            />
+          </a>
+        ))}
+      </div>
+
+      <!-- 右侧：信息栏（桌面 sticky） -->
+      <aside class="lg:sticky lg:top-24 self-start">
+        <div class="bg-white border border-accent-100 rounded-xl p-6 md:p-8 space-y-6">
+
+          <!-- 标题 & 描述 -->
+          <div>
+            <h1 class="text-2xl md:text-3xl font-display font-semibold text-accent-900 leading-tight text-balance">
+              {title}
+            </h1>
+            <p class="mt-3 text-accent-500 leading-relaxed">{description}</p>
+          </div>
+
+          <hr class="border-accent-100" />
+
+          <!-- 案例信息 -->
+          <dl class="space-y-4 text-sm">
+            {location && (
+              <div class="flex justify-between">
+                <dt class="text-accent-400">项目地点</dt>
+                <dd class="text-accent-700 font-medium">{location}</dd>
+              </div>
+            )}
+            {area && (
+              <div class="flex justify-between">
+                <dt class="text-accent-400">面积</dt>
+                <dd class="text-accent-700 font-medium">{area} ㎡</dd>
+              </div>
+            )}
+            <div class="flex justify-between">
+              <dt class="text-accent-400">发布时间</dt>
+              <dd class="text-accent-700 font-medium">{dateStr}</dd>
+            </div>
+            {sourceUrl && (
+              <div class="flex justify-between items-center">
+                <dt class="text-accent-400">来源</dt>
+                <dd>
+                  <a href={sourceUrl} target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:text-primary-700 font-medium underline underline-offset-2">
+                    {platformLabels[sourcePlatform] ?? '查看原文'} ↗
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+
+          <hr class="border-accent-100" />
+
+          <!-- 标签 -->
+          <div>
+            <h3 class="text-xs font-medium text-accent-400 uppercase tracking-wider mb-3">
+              空间
+            </h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+              {spaceLabels.map(s => (
+                <a href={`/spaces/${s.slug}`} class="tag">{s.label}</a>
+              ))}
+            </div>
+
+            <h3 class="text-xs font-medium text-accent-400 uppercase tracking-wider mb-3">
+              风格
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {styleLabels.map(s => (
+                <a href={`/styles/${s.slug}`} class="tag">{s.label}</a>
+              ))}
+            </div>
+          </div>
+
+          {/* 移动端：回到顶部 */}
+          <button
+            onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+            class="w-full btn-outline text-sm md:hidden"
+          >
+            回到顶部 ↑
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- 相关推荐 -->
+    <RelatedCases
+      currentId={c.id}
+      caseSpaces={caseSpaces}
+      caseStyles={caseStyles}
+    />
+  </article>
+</BaseLayout>

@@ -1,0 +1,21 @@
+# build output
+dist/
+.netlify/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# env
+.env
+.env.*
+
+# editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

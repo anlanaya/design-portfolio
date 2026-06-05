@@ -1,0 +1,49 @@
+---
+import CaseCard from './CaseCard.astro';
+import { getCollection } from 'astro:content';
+// categories used for display labels via getCollection
+
+interface Props {
+  currentId: string;
+  caseSpaces: string[];
+  caseStyles: string[];
+}
+
+const { currentId, caseSpaces, caseStyles } = Astro.props;
+
+// 获取所有案例，按关联度排序
+const allCases = await getCollection('cases');
+const otherCases = allCases.filter(c => c.id.replace('.md', '') !== currentId.replace('.md', ''));
+
+// 关联度评分：同空间 + 同风格各加分
+const scored = otherCases.map(c => {
+  let score = 0;
+  c.data.spaces.forEach(s => { if (caseSpaces.includes(s)) score += 2; });
+  c.data.styles.forEach(s => { if (caseStyles.includes(s)) score += 3; });
+  return { case: c, score };
+});
+
+const related = scored
+  .filter(r => r.score > 0)
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3)
+  .map(r => r.case);
+
+// 如果相关案例不够，用同级案例补足
+if (related.length < 3) {
+  const sameSpaceCases = otherCases.filter(c =>
+    c.data.spaces.some(s => caseSpaces.includes(s)) &&
+    !related.find(r => r.id === c.id)
+  ).slice(0, 3 - related.length);
+  related.push(...sameSpaceCases);
+}
+---
+
+{related.length > 0 && (
+  <section class="mt-16 pt-12 border-t border-accent-100">
+    <h2 class="text-xl font-display font-semibold text-accent-900 mb-8">你可能也喜欢</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {related.map(c => <CaseCard case={c} />)}
+    </div>
+  </section>
+)}

@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-white text-accent-900 font-sans;
+  }
+
+  ::selection {
+    @apply bg-primary-200 text-primary-950;
+  }
+}
+
+@layer components {
+  /* 导航链接 */
+  .nav-link {
+    @apply text-sm font-medium tracking-wide uppercase text-accent-600
+           hover:text-accent-900 transition-colors duration-200
+           py-2 border-b-2 border-transparent hover:border-primary-400;
+  }
+
+  .nav-link-active {
+    @apply border-primary-500 text-accent-900;
+  }
+
+  /* 按钮 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-8 py-3
+           bg-accent-900 text-white text-sm font-medium tracking-wide
+           hover:bg-accent-800 active:bg-accent-950
+           transition-colors duration-200 cursor-pointer;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-8 py-3
+           border border-accent-300 text-accent-700 text-sm font-medium tracking-wide
+           hover:border-accent-900 hover:text-accent-900
+           transition-colors duration-200 cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2
+           text-accent-600 text-sm font-medium
+           hover:text-accent-900 hover:bg-accent-50
+           transition-colors duration-200 cursor-pointer;
+  }
+
+  /* 标签/筛选按钮 */
+  .tag {
+    @apply inline-flex items-center px-4 py-1.5 text-sm rounded-full
+           border border-accent-200 text-accent-600
+           hover:border-accent-400 hover:text-accent-800
+           transition-colors duration-200 cursor-pointer
+           whitespace-nowrap;
+  }
+
+  .tag-active {
+    @apply bg-accent-900 text-white border-accent-900
+           hover:bg-accent-800 hover:text-white hover:border-accent-800;
+  }
+
+  /* 案例卡片 */
+  .case-card {
+    @apply relative overflow-hidden bg-accent-50;
+  }
+
+  .case-card-image {
+    @apply w-full aspect-[4/3] object-cover
+           transition-transform duration-500;
+  }
+
+  .case-card-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent
+           transition-opacity duration-300;
+  }
+
+  /* 图片画廊 */
+  .gallery-image {
+    @apply w-full cursor-pointer hover:opacity-95 transition-opacity;
+  }
+
+  /* 灯箱 */
+  .lightbox {
+    @apply fixed inset-0 z-50 bg-black/95 flex items-center justify-center;
+  }
+
+  /* 平滑进入动画 */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 骨架屏 */
+  .skeleton {
+    @apply bg-accent-100 animate-pulse;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -1,0 +1,56 @@
+---
+import { spaces, styles } from '../data/categories';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  case: CollectionEntry<'cases'>;
+}
+
+const { case: c } = Astro.props;
+const { title, cover, spaces: caseSpaces, styles: caseStyles, area, publishDate } = c.data;
+
+// 获取空间和风格的显示名称
+const spaceLabels = caseSpaces
+  .map(slug => spaces.find(s => s.slug === slug)?.label)
+  .filter(Boolean) as string[];
+
+const styleLabels = caseStyles
+  .map(slug => styles.find(s => s.slug === slug)?.label)
+  .filter(Boolean) as string[];
+
+// 格式化日期
+const dateStr = publishDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' });
+---
+
+<a href={`/cases/${c.id.replace('.md', '')}`} class="case-card group block">
+  <div class="relative overflow-hidden bg-accent-100">
+    <img
+      src={cover}
+      alt={title}
+      class="case-card-image group-hover:scale-105"
+      loading="lazy"
+      decoding="async"
+    />
+    <!-- 悬浮信息层 -->
+    <div class="case-card-overlay opacity-0 group-hover:opacity-100 flex items-end p-4 md:p-6">
+      <div class="text-white">
+        <div class="flex flex-wrap gap-1.5 mb-2">
+          {styleLabels.slice(0, 2).map(label => (
+            <span class="text-xs px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full">{label}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-4">
+    <h3 class="font-medium text-accent-900 group-hover:text-primary-600 transition-colors text-balance leading-snug">
+      {title}
+    </h3>
+    <div class="mt-2 flex items-center gap-3 text-xs text-accent-400">
+      {spaceLabels.length > 0 && <span>{spaceLabels.slice(0, 2).join(' · ')}</span>}
+      {area && <span>{area}㎡</span>}
+      <span class="ml-auto">{dateStr}</span>
+    </div>
+  </div>
+</a>

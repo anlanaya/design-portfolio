@@ -1,0 +1,62 @@
+---
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { href: '/', label: '首页', icon: 'home' },
+  { href: '/spaces/whole-house', label: '空间', icon: 'spaces' },
+  { href: '/styles/modern-minimalist', label: '风格', icon: 'styles' },
+  { href: '/about', label: '关于', icon: 'about' },
+];
+---
+
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-accent-100 safe-area-bottom">
+  <div class="flex items-center justify-around h-14">
+    {navItems.map((item) => {
+      const isActive = item.href === '/'
+        ? currentPath === '/'
+        : currentPath.startsWith('/' + item.href.split('/')[1] + '/') || currentPath === item.href;
+
+      return (
+        <a
+          href={item.href}
+          class="flex flex-col items-center justify-center gap-0.5 min-w-0 px-3 py-1"
+          class:list={[
+            isActive ? 'text-accent-900' : 'text-accent-400'
+          ]}
+        >
+          <span class="text-lg leading-none">
+            {item.icon === 'home' && (
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+                <path d="M3 12l2-2m0 0l7-7 7 7m-14 0v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            )}
+            {item.icon === 'spaces' && (
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="8" height="8" rx="1" />
+                <rect x="13" y="3" width="8" height="8" rx="1" />
+                <rect x="3" y="13" width="8" height="8" rx="1" />
+                <rect x="13" y="13" width="8" height="8" rx="1" />
+              </svg>
+            )}
+            {item.icon === 'styles' && (
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="3" />
+                <circle cx="6" cy="6" r="2" />
+                <circle cx="18" cy="6" r="2" />
+                <circle cx="6" cy="18" r="2" />
+                <circle cx="18" cy="18" r="2" />
+              </svg>
+            )}
+            {item.icon === 'about' && (
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+              </svg>
+            )}
+          </span>
+          <span class="text-[10px] leading-tight">{item.label}</span>
+          {isActive && <span class="w-1 h-1 rounded-full bg-accent-900 mt-0.5" />}
+        </a>
+      );
+    })}
+  </div>
+</nav>
