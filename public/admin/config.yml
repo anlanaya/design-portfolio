@@ -2,8 +2,6 @@ backend:
   name: github
   repo: anlanaya/design-portfolio
   branch: master
-  base_url: https://api.netlify.com
-  auth_endpoint: auth
 
 site_url: https://design.gmlbest.top
 display_url: https://design.gmlbest.top
