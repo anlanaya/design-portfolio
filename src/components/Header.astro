@@ -53,6 +53,9 @@ const currentPath = Astro.url.pathname;
       <a href="/contact" class:list={['nav-link', { 'nav-link-active': currentPath === '/contact' }]}>
         联系
       </a>
+      <a href="/admin" class="px-3 py-1.5 ml-2 text-xs font-medium bg-accent-900 text-white rounded-full hover:bg-accent-800 transition-colors">
+        + 添加
+      </a>
     </div>
 
     <!-- Mobile hamburger -->
@@ -96,6 +99,7 @@ const currentPath = Astro.url.pathname;
     ))}
 
     <div class="mt-6 pt-4 border-t border-accent-100">
+      <a href="/admin" class="block py-3 text-accent-700 hover:text-accent-900 font-medium">+ 添加案例</a>
       <a href="/about" class="block py-3 text-accent-700 hover:text-accent-900">关于</a>
       <a href="/contact" class="block py-3 text-accent-700 hover:text-accent-900">联系</a>
     </div>

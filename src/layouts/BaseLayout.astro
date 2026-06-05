@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MobileNav from '../components/MobileNav.astro';
+import AddCasePanel from '../components/AddCasePanel.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -43,5 +44,6 @@ const metaImage = ogImage ?? '/images/og-default.jpg';
     </main>
     <Footer />
     <MobileNav />
+    <AddCasePanel />
   </body>
 </html>
