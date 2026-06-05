@@ -1,48 +1,54 @@
-// 简易 OAuth 代理 Worker
-// 部署后把 Worker URL 填入 Decap CMS 的 base_url
-
+// OAuth 代理 Worker
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
+    const clientId = 'Ov23li87HPVkywfQf6g7';
 
     // GET /auth → 重定向到 GitHub
     if (url.pathname === '/auth') {
-      const clientId = 'Ov23li87HPVkywfQf6g7';
       const redirectUri = url.origin + '/callback';
-      const scope = 'repo,user';
-      const ghUrl = 'https://github.com/login/oauth/authorize?' +
-        new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, scope });
-      return Response.redirect(ghUrl, 302);
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        scope: 'repo,user',
+      });
+      return Response.redirect('https://github.com/login/oauth/authorize?' + params, 302);
     }
 
-    // GET /callback → GitHub 回调，交换 token
+    // GET /callback → 交换 token
     if (url.pathname === '/callback') {
       const code = url.searchParams.get('code');
       if (!code) return new Response('Missing code', { status: 400 });
 
-      const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          client_id: 'Ov23li87HPVkywfQf6g7',
-          client_secret: '6b7619d9c912bda02919dd70246fe28bea7c41f8',
-          code,
-        }),
-      });
-      const tokenData = await tokenRes.json();
+      try {
+        const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            client_id: clientId,
+            client_secret: env.GH_CLIENT_SECRET,
+            code,
+          }),
+        });
+        const data = await tokenRes.json();
 
-      const html = `<!DOCTYPE html><html><head><script>
-        if (window.opener) {
-          window.opener.postMessage(${JSON.stringify(tokenData)}, '*');
-        } else {
-          document.body.textContent = '已授权，请关闭此窗口';
-        }
-        setTimeout(function(){ window.close(); }, 1000);
-      <\/script></head><body>授权成功，窗口即将关闭...</body></html>`;
+        const html = `<!DOCTYPE html><html><head><script>
+          if (window.opener) {
+            window.opener.postMessage(${JSON.stringify(JSON.stringify(data))}, '*');
+          }
+          document.body.textContent = '授权成功，三秒后自动关闭...';
+          setTimeout(function(){ window.close(); }, 3000);
+        <\/script></head><body style="text-align:center;padding-top:40px;font-family:sans-serif;">
+          <p>授权成功！窗口即将关闭。</p>
+          <p>如果没有自动关闭，请手动关闭此窗口。</p>
+        </body></html>`;
 
-      return new Response(html, { headers: { 'Content-Type': 'text/html' } });
+        return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+      } catch (err) {
+        return new Response('Token exchange error: ' + err.message, { status: 500 });
+      }
     }
 
-    return new Response('OAuth Proxy', { status: 200 });
+    return new Response('OK', { status: 200 });
   }
 };
