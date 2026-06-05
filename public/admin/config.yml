@@ -1,0 +1,74 @@
+backend:
+  name: github
+  repo: anlanaya/design-portfolio
+  branch: master
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+site_url: https://design.gmlbest.top
+display_url: https://design.gmlbest.top
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "cases"
+    label: "设计案例"
+    label_singular: "案例"
+    folder: "src/content/cases"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: false
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "描述", name: "description", widget: "text" }
+      - { label: "发布日期", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD", time_format: false }
+      - { label: "首页推荐", name: "featured", widget: "boolean", default: false }
+      - label: "空间标签"
+        name: "spaces"
+        widget: "select"
+        multiple: true
+        options:
+          - { label: "全屋案例", value: "whole-house" }
+          - { label: "客厅", value: "living-room" }
+          - { label: "卧室", value: "bedroom" }
+          - { label: "厨餐厅", value: "kitchen-dining" }
+          - { label: "卫生间", value: "bathroom" }
+          - { label: "书房", value: "study" }
+          - { label: "玄关", value: "entrance" }
+          - { label: "阳台", value: "balcony" }
+          - { label: "儿童房", value: "kids-room" }
+          - { label: "衣帽间", value: "cloakroom" }
+          - { label: "商业空间", value: "commercial" }
+      - label: "风格标签"
+        name: "styles"
+        widget: "select"
+        multiple: true
+        options:
+          - { label: "现代极简", value: "modern-minimalist" }
+          - { label: "日式/侘寂", value: "japanese-wabisabi" }
+          - { label: "北欧", value: "nordic" }
+          - { label: "新中式", value: "neo-chinese" }
+          - { label: "轻奢", value: "light-luxury" }
+          - { label: "工业风", value: "industrial" }
+          - { label: "奶油风", value: "cream-style" }
+          - { label: "原木风", value: "original-wood" }
+          - { label: "复古", value: "vintage" }
+      - { label: "面积（㎡）", name: "area", widget: "number", required: false }
+      - { label: "地点", name: "location", widget: "string", required: false }
+      - { label: "来源链接", name: "sourceUrl", widget: "string", required: false }
+      - label: "来源平台"
+        name: "sourcePlatform"
+        widget: "select"
+        default: "xiaohongshu"
+        options:
+          - { label: "小红书", value: "xiaohongshu" }
+          - { label: "抖音", value: "douyin" }
+          - { label: "原创", value: "original" }
+      - { label: "封面图", name: "cover", widget: "image" }
+      - label: "详情图集"
+        name: "gallery"
+        widget: "list"
+        field: { label: "图片", name: "image", widget: "image" }
+      - { label: "设计说明", name: "body", widget: "markdown", required: false }
